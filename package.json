@@ -1,0 +1,13 @@
+{
+  "name": "markfluence",
+  "version": "0.1.0",
+  "description": "Markdown to Confluence converter",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": { "build": "tsc", "dev": "tsc --watch" },
+  "author": "Vladimir Urushev <pilat@github>",
+  "license": "MIT",
+  "engines": { "node": ">=18.0.0" },
+  "devDependencies": { "@types/node": "^22.10.5", "typescript": "^5.7.3" }
+}
