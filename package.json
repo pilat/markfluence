@@ -5,9 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": { "build": "tsc", "dev": "tsc --watch" },
+  "scripts": { "build": "tsc", "dev": "tsc --watch", "lint": "biome check .", "lint:fix": "biome check --write ." },
   "author": "Vladimir Urushev <pilat@github>",
   "license": "MIT",
   "engines": { "node": ">=18.0.0" },
-  "devDependencies": { "@types/node": "^22.10.5", "typescript": "^5.7.3" }
+  "devDependencies": { "@biomejs/biome": "^2.3.11", "@types/node": "^22.10.5", "typescript": "^5.7.3" }
 }
