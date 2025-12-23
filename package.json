@@ -9,5 +9,13 @@
   "author": "Vladimir Urushev <pilat@github>",
   "license": "MIT",
   "engines": { "node": ">=18.0.0" },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.2",
+    "mdast-util-frontmatter": "^2.0.1",
+    "mdast-util-gfm": "^3.0.0",
+    "micromark-extension-frontmatter": "^2.0.0",
+    "micromark-extension-gfm": "^3.0.0",
+    "yaml": "^2.7.0"
+  },
   "devDependencies": { "@biomejs/biome": "^2.3.11", "@types/node": "^22.10.5", "typescript": "^5.7.3" }
 }
