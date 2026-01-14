@@ -21,6 +21,14 @@
   "keywords": ["markdown", "confluence", "atlassian", "converter", "documentation"],
   "author": "Vladimir Urushev",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pilat/markfluence"
+  },
+  "homepage": "https://github.com/pilat/markfluence",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": { "node": ">=18.0.0" },
   "dependencies": {
     "@mermaid-js/layout-elk": "^0.2.0",
