@@ -19,7 +19,7 @@
     "prepublishOnly": "npm run check && npm run build"
   },
   "keywords": ["markdown", "confluence", "atlassian", "converter", "documentation"],
-  "author": "Vladimir Urushev <pilat@github>",
+  "author": "Vladimir Urushev",
   "license": "MIT",
   "engines": { "node": ">=18.0.0" },
   "dependencies": {
