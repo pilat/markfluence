@@ -1,12 +1,16 @@
 {
   "name": "markfluence",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The best Markdown to Confluence converter. Modern, fast, correct.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": { "markfluence": "dist/cli.js" },
-  "files": ["dist"],
+  "bin": {
+    "markfluence": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -18,7 +22,13 @@
     "check": "npm run typecheck && npm run lint",
     "prepublishOnly": "npm run check && npm run build"
   },
-  "keywords": ["markdown", "confluence", "atlassian", "converter", "documentation"],
+  "keywords": [
+    "markdown",
+    "confluence",
+    "atlassian",
+    "converter",
+    "documentation"
+  ],
   "author": "Vladimir Urushev",
   "license": "MIT",
   "repository": {
@@ -29,7 +39,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "engines": { "node": ">=18.0.0" },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@mermaid-js/layout-elk": "^0.2.0",
     "@resvg/resvg-js": "^2.6.2",
