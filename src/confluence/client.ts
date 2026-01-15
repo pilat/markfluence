@@ -116,7 +116,7 @@ export class ConfluenceClient {
 
   async uploadAttachment(pageId: string, filename: string, data: Buffer, contentType: string): Promise<Attachment> {
     const formData = new FormData()
-    const blob = new Blob([data], { type: contentType })
+    const blob = new Blob([new Uint8Array(data)], { type: contentType })
     formData.append('file', blob, filename)
 
     const url = `${this.baseUrl}/content/${pageId}/child/attachment`
@@ -159,7 +159,7 @@ export class ConfluenceClient {
     contentType: string,
   ): Promise<Attachment> {
     const formData = new FormData()
-    const blob = new Blob([data], { type: contentType })
+    const blob = new Blob([new Uint8Array(data)], { type: contentType })
     formData.append('file', blob, filename)
 
     const url = `${this.baseUrl}/content/${pageId}/child/attachment/${attachmentId}/data`
