@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-01-15
+
+### Changed
+
+- Minimum Node.js version bumped to 22 (Node 20 EOL April 2026)
+
 ## [0.1.1] - 2026-01-14
 
 ### Added

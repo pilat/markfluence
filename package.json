@@ -1,6 +1,6 @@
 {
   "name": "markfluence",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "The best Markdown to Confluence converter. Modern, fast, correct.",
   "type": "module",
   "main": "dist/index.js",
