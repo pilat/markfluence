@@ -72,6 +72,7 @@ Control page behavior with YAML frontmatter:
 ---
 title: My Page Title
 confluence-page-id: 123456789
+confluence-space: DOCS
 labels: [documentation, api]
 ---
 
@@ -82,6 +83,7 @@ labels: [documentation, api]
 |-------|-------------|
 | `title` | Override the page title (default: first H1 or filename) |
 | `confluence-page-id` | Update an existing page by ID |
+| `confluence-space` | Override the target space for this file |
 | `labels` | Array of Confluence labels to apply |
 
 ## Supported Markdown

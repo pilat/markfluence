@@ -179,6 +179,62 @@ describe('syncFiles', () => {
     })
   })
 
+  describe('per-file space override', () => {
+    it('uses space from frontmatter when available', async () => {
+      const fs = await import('node:fs')
+      const path = await import('node:path')
+      const os = await import('node:os')
+
+      const tempDir = os.tmpdir()
+      const tempFile = path.join(tempDir, 'test-space-override.md')
+      fs.writeFileSync(
+        tempFile,
+        `---
+confluence-space: OTHER
+---
+# Test Page
+
+Content here.
+`,
+      )
+
+      try {
+        // Mock search by title in OTHER space — returns empty
+        fetchMock.mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ results: [] }),
+        })
+
+        // Mock createPage
+        const newPage = {
+          id: '789',
+          title: 'Test Page',
+          version: { number: 1 },
+          _links: { webui: '/pages/789' },
+        }
+        fetchMock.mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(newPage),
+        })
+
+        const results = await syncFiles([tempFile], mockConfig)
+
+        expect(results).toHaveLength(1)
+        expect(results[0].action).toBe('created')
+        // Search should use OTHER space, not TEST
+        expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('spaceKey=OTHER'), expect.anything())
+        // Create should use OTHER space
+        const createCall = fetchMock.mock.calls[1]
+        const createBody = JSON.parse(createCall[1].body)
+        expect(createBody.space.key).toBe('OTHER')
+      } finally {
+        fs.unlinkSync(tempFile)
+      }
+    })
+  })
+
   describe('page lookup by ID', () => {
     it('uses page ID from frontmatter when available', async () => {
       // Create a temp file with frontmatter
