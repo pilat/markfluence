@@ -66,7 +66,8 @@ async function syncFile(file: string, config: Config, client: ConfluenceClient):
   // Check if page exists
   let existingPage: Page | null = null
   const pageId = frontmatter['confluence-page-id']
-  const space = frontmatter['confluence-space'] || config.space
+  const frontmatterSpace = frontmatter['confluence-space']?.trim()
+  const space = frontmatterSpace ? frontmatterSpace : config.space
 
   if (pageId) {
     existingPage = await client.getPage(pageId)

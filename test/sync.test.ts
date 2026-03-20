@@ -185,7 +185,7 @@ describe('syncFiles', () => {
       const path = await import('node:path')
       const os = await import('node:os')
 
-      const tempDir = os.tmpdir()
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'markfluence-space-'))
       const tempFile = path.join(tempDir, 'test-space-override.md')
       fs.writeFileSync(
         tempFile,
@@ -230,7 +230,7 @@ Content here.
         const createBody = JSON.parse(createCall[1].body)
         expect(createBody.space.key).toBe('OTHER')
       } finally {
-        fs.unlinkSync(tempFile)
+        fs.rmSync(tempDir, { recursive: true, force: true })
       }
     })
   })
