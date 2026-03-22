@@ -15,6 +15,7 @@ export interface Config {
 
 export interface Frontmatter {
   'confluence-page-id'?: string
+  'confluence-space'?: string
   title?: string
   labels?: string[]
 }

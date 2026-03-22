@@ -66,11 +66,13 @@ async function syncFile(file: string, config: Config, client: ConfluenceClient):
   // Check if page exists
   let existingPage: Page | null = null
   const pageId = frontmatter['confluence-page-id']
+  const frontmatterSpace = frontmatter['confluence-space']?.trim()
+  const space = frontmatterSpace ? frontmatterSpace : config.space
 
   if (pageId) {
     existingPage = await client.getPage(pageId)
   } else {
-    existingPage = await client.getPageByTitle(config.space, title)
+    existingPage = await client.getPageByTitle(space, title)
   }
 
   if (config.dryRun) {
@@ -114,7 +116,7 @@ async function syncFile(file: string, config: Config, client: ConfluenceClient):
     }
   } else {
     // Create new page
-    result = await client.createPage(config.space, title, content, config.parentPageId)
+    result = await client.createPage(space, title, content, config.parentPageId)
     action = 'created'
     if (config.verbose) {
       console.log(`Created: ${title}`)
