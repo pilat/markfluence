@@ -1,6 +1,6 @@
 {
   "name": "markfluence",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The best Markdown to Confluence converter. Modern, fast, correct.",
   "type": "module",
   "main": "dist/index.js",
@@ -55,7 +55,7 @@
     "yaml": "^2.7.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "^2.4.8",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^4.0.17"
