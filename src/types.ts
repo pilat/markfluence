@@ -63,4 +63,4 @@ export interface ConfluenceAttachment {
   }
 }
 
-export type { Node, Parent, Literal }
+export type { Literal, Node, Parent }

@@ -2,7 +2,7 @@ import type { Node, Parent } from 'mdast'
 import { type Converter, converters, registerConverter } from './registry.js'
 import type { ConversionContext } from './types.js'
 
-export { registerConverter, type Converter }
+export { type Converter, registerConverter }
 
 import './elements/root.js'
 import './elements/paragraph.js'
