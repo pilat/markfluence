@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { Resvg } from '@resvg/resvg-js'
+import { patchSvgdomStyle } from './style-polyfill.js'
 
 // Patch JSON.stringify to handle circular references (elkjs debug logs)
 const originalStringify = JSON.stringify
@@ -49,6 +50,8 @@ async function loadMermaid() {
       win.setInterval = setInterval
       win.clearInterval = clearInterval
       win.console = console
+
+      patchSvgdomStyle(win)
     }
 
     // Load and register ELK layout engine
