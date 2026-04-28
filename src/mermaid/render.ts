@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto'
 import { Resvg } from '@resvg/resvg-js'
-import { patchSvgdomStyle } from './style-polyfill.js'
 
 // Patch JSON.stringify to handle circular references (elkjs debug logs)
 const originalStringify = JSON.stringify
@@ -50,8 +49,6 @@ async function loadMermaid() {
       win.setInterval = setInterval
       win.clearInterval = clearInterval
       win.console = console
-
-      patchSvgdomStyle(win)
     }
 
     // Load and register ELK layout engine
@@ -116,6 +113,9 @@ export async function renderMermaid(code: string): Promise<Buffer> {
     // Remove max-width style that can confuse renderers
     svg = svg.replace(/style="[^"]*max-width:[^;]*;?\s*"/, '')
   }
+
+  // resvg doesn't support orient="auto-start-reverse" on markers
+  svg = svg.replace(/orient="auto-start-reverse"/g, 'orient="auto"')
 
   // Convert SVG to PNG with 4x scale for crisp images
   const resvg = new Resvg(svg, {
