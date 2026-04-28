@@ -7,9 +7,9 @@ Project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.3.1] - 2026-04-28
 
-### Fixed
+### Added
 
-- Sequence diagram rendering (polyfill CSSStyleDeclaration for svgdom)
+- Sequence diagram support (mermaid 11.14, svgdom 0.1.23)
 
 ### Changed
 
