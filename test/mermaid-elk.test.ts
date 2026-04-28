@@ -87,8 +87,28 @@ flowchart TB
     expect(filename).toMatch(/^mermaid-[a-f0-9]{12}\.png$/)
   })
 
-  // Note: sequence/state diagrams don't work with isomorphic-mermaid (svgdom limitations)
-  // flowcharts with ELK are our primary use case
+  it('renders sequence diagrams - regression test for CSSStyleDeclaration polyfill', async () => {
+    // D3 (bundled in mermaid) calls element.style.removeProperty() during sequence rendering
+    // svgdom doesn't implement CSSStyleDeclaration, so we polyfill it
+    // Without the polyfill: TypeError: this.style.removeProperty is not a function
+    const sequenceDiagram = `
+sequenceDiagram
+    participant A as Service A
+    participant B as Service B
+    A->>B: Request
+    B-->>A: Response
+`
+    const png = await renderMermaid(sequenceDiagram)
+
+    // Check PNG magic bytes
+    expect(png[0]).toBe(0x89)
+    expect(png[1]).toBe(0x50)
+    expect(png[2]).toBe(0x4e)
+    expect(png[3]).toBe(0x47)
+
+    // Sequence diagram should render to reasonable size
+    expect(png.length).toBeGreaterThan(5000)
+  })
 
   it('does not crop tall diagrams - regression test for missing height attribute', async () => {
     // This diagram has many nested subgraphs and is tall
