@@ -32,6 +32,22 @@ async function loadMermaid() {
     const mod = await import('isomorphic-mermaid')
     mermaid = mod.default
 
+    // @acemir/cssom (jsdom's CSS engine, pulled in by isomorphic-mermaid) reads a *bare global*
+    // `CSSStyleSheet` while rendering. isomorphic-mermaid swaps `window` for svgdom's, which never
+    // defines it, so depending on platform/timing the global is missing -> intermittent
+    // `ReferenceError: CSSStyleSheet is not defined` (flaky in CI, rarely local). Define it once,
+    // up front, from the same cssom jsdom uses; fall back to a stub if that package ever moves.
+    // biome-ignore lint/suspicious/noExplicitAny: patching globals for the svgdom render env
+    const g = globalThis as any
+    if (typeof g.CSSStyleSheet === 'undefined') {
+      try {
+        const cssom = await import('@acemir/cssom')
+        g.CSSStyleSheet = cssom.CSSStyleSheet ?? cssom.default?.CSSStyleSheet ?? class CSSStyleSheet {}
+      } catch {
+        g.CSSStyleSheet = class CSSStyleSheet {}
+      }
+    }
+
     // Patch window with everything elkjs needs (GWT compatibility)
     // isomorphic-mermaid sets window = svgWindow which lacks these
     // biome-ignore lint/suspicious/noExplicitAny: patching global window for GWT
@@ -49,6 +65,7 @@ async function loadMermaid() {
       win.setInterval = setInterval
       win.clearInterval = clearInterval
       win.console = console
+      win.CSSStyleSheet = g.CSSStyleSheet
     }
 
     // Load and register ELK layout engine
