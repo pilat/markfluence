@@ -180,6 +180,90 @@ describe('syncFiles', () => {
     })
   })
 
+  describe('attachment upload', () => {
+    // Writes a markdown file referencing a local image, returns the content-hashed
+    // attachment name Confluence would store it under (basename-<md5>.ext).
+    async function withLocalImage(): Promise<{ file: string; attachmentName: string; cleanup: () => void }> {
+      const fs = await import('node:fs')
+      const path = await import('node:path')
+      const os = await import('node:os')
+      const { createHash } = await import('node:crypto')
+
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'markfluence-attach-'))
+      const data = Buffer.from('fake-png-bytes')
+      fs.writeFileSync(path.join(dir, 'pic.png'), data)
+      const file = path.join(dir, 'page.md')
+      fs.writeFileSync(file, '# Title\n\n![pic](./pic.png)\n')
+
+      const hash = createHash('md5').update(data).digest('hex').slice(0, 12)
+      return {
+        file,
+        attachmentName: `pic-${hash}.png`,
+        cleanup: () => fs.rmSync(dir, { recursive: true, force: true }),
+      }
+    }
+
+    const existingPage = {
+      id: '123',
+      title: 'Title',
+      version: { number: 1 },
+      body: { storage: { value: '<p>old</p>' } },
+      _links: { webui: '/pages/123' },
+    }
+    const updatedPage = { id: '123', title: 'Title', version: { number: 2 }, _links: { webui: '/pages/123' } }
+
+    it('skips re-uploading an attachment that already exists (idempotent re-sync)', async () => {
+      const { file, attachmentName, cleanup } = await withLocalImage()
+      try {
+        fetchMock
+          // getPageByTitle
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ results: [existingPage] }) })
+          // updatePage
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(updatedPage) })
+          // getAttachments — the image is already there under the same content-hashed name
+          .mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve({ results: [{ id: 'att-1', title: attachmentName }] }),
+          })
+
+        const results = await syncFiles([file], mockConfig)
+
+        // The file must still be reported as updated, not silently dropped on an attachment error.
+        expect(results).toHaveLength(1)
+        expect(results[0].action).toBe('updated')
+        // getPageByTitle + updatePage + getAttachments, and crucially NO re-upload POST.
+        expect(fetchMock).toHaveBeenCalledTimes(3)
+        expect(fetchMock.mock.calls.some((c) => c[1]?.method === 'POST')).toBe(false)
+      } finally {
+        cleanup()
+      }
+    })
+
+    it('uploads an attachment that is not yet present', async () => {
+      const { file, cleanup } = await withLocalImage()
+      try {
+        fetchMock
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ results: [existingPage] }) })
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(updatedPage) })
+          // getAttachments — nothing there yet
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ results: [] }) })
+          // uploadAttachment
+          .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ id: 'att-2' }) })
+
+        const results = await syncFiles([file], mockConfig)
+
+        expect(results).toHaveLength(1)
+        expect(results[0].action).toBe('updated')
+        expect(fetchMock).toHaveBeenCalledTimes(4)
+        const postCall = fetchMock.mock.calls.find((c) => c[1]?.method === 'POST')
+        expect(postCall?.[0]).toContain('/child/attachment')
+      } finally {
+        cleanup()
+      }
+    })
+  })
+
   describe('per-file space override', () => {
     it('uses space from frontmatter when available', async () => {
       const fs = await import('node:fs')

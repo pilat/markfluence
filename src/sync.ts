@@ -148,25 +148,23 @@ async function uploadAttachments(
   client: ConfluenceClient,
   config: Config,
 ): Promise<void> {
-  // Get existing attachments to avoid duplicates
   const existing = await client.getAttachments(pageId)
-  const existingMap = new Map(existing.map((a) => [a.title, a]))
+  const existingNames = new Set(existing.map((a) => a.title))
 
   for (const [filename, info] of attachments) {
-    const existingAttachment = existingMap.get(filename)
+    // Attachment names embed an md5 of their content, so a name match means the bytes are
+    // already identical. Re-uploading is a no-op that Confluence Cloud rejects with
+    // "UnexpectedRollbackException: marked as rollback-only" — skip instead of re-uploading.
+    if (existingNames.has(filename)) {
+      if (config.verbose) {
+        console.log(`  Skipped attachment (unchanged): ${filename}`)
+      }
+      continue
+    }
 
-    if (existingAttachment) {
-      // Update existing attachment
-      await client.updateAttachment(pageId, existingAttachment.id, filename, info.data, info.contentType)
-      if (config.verbose) {
-        console.log(`  Updated attachment: ${filename}`)
-      }
-    } else {
-      // Upload new attachment
-      await client.uploadAttachment(pageId, filename, info.data, info.contentType)
-      if (config.verbose) {
-        console.log(`  Uploaded attachment: ${filename}`)
-      }
+    await client.uploadAttachment(pageId, filename, info.data, info.contentType)
+    if (config.verbose) {
+      console.log(`  Uploaded attachment: ${filename}`)
     }
   }
 }

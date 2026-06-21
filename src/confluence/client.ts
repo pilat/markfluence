@@ -150,49 +150,6 @@ export class ConfluenceClient {
     }
     return result
   }
-
-  async updateAttachment(
-    pageId: string,
-    attachmentId: string,
-    filename: string,
-    data: Buffer,
-    contentType: string,
-  ): Promise<Attachment> {
-    const formData = new FormData()
-    const blob = new Blob([data], { type: contentType })
-    formData.append('file', blob, filename)
-
-    const url = `${this.baseUrl}/content/${pageId}/child/attachment/${attachmentId}/data`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: this.authHeader,
-        'X-Atlassian-Token': 'nocheck',
-      },
-      body: formData,
-    })
-
-    if (!response.ok) {
-      let errorMessage: string
-      try {
-        const errorBody = (await response.json()) as { message?: string }
-        errorMessage = errorBody.message || response.statusText
-      } catch {
-        errorMessage = response.statusText
-      }
-      throw new ConfluenceApiError({
-        statusCode: response.status,
-        message: errorMessage,
-      })
-    }
-
-    // API may return attachment directly or wrapped in results array
-    const result = (await response.json()) as Attachment | AttachmentSearchResult
-    if ('results' in result) {
-      return result.results[0]
-    }
-    return result
-  }
 }
 
 export class ConfluenceApiError extends Error {
