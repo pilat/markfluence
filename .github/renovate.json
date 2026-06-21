@@ -7,7 +7,7 @@
     ":semanticCommitTypeAll(fix)",
     ":semanticCommitScopeDisabled"
   ],
-  "minimumReleaseAge": "24 hours",
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "description": "Group all GitHub Actions bumps into one PR",
