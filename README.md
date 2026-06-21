@@ -8,6 +8,7 @@ The best Markdown to Confluence converter. Direct AST-to-XML conversion with no 
 - **Full GFM support** — Tables, task lists, strikethrough, autolinks
 - **Mermaid diagrams** — Rendered to PNG with ELK layout engine
 - **Admonitions** — `[!NOTE]`, `[!WARNING]`, `[!TIP]` → Confluence info panels
+- **Raw passthrough** — ` ```confluence ` blocks emit storage XML verbatim (toc, status, …)
 - **Smart sync** — MD5-based change detection, only uploads when content changes
 - **Local images** — Automatically uploaded as attachments
 - **Frontmatter** — Control page ID, title, and labels via YAML
@@ -153,6 +154,21 @@ flowchart TD
 ````
 
 Mermaid diagrams are rendered to PNG with ELK layout engine for better handling of complex flowcharts and subgraphs.
+
+### Raw Confluence Passthrough
+
+For Confluence macros that have no Markdown equivalent (table of contents, status lozenges, expand/details panels, …), a ` ```confluence ` fenced block is passed through to the page's storage format **verbatim** — not escaped, not wrapped in a code macro.
+
+````markdown
+```confluence
+<ac:structured-macro ac:name="toc">
+  <ac:parameter ac:name="minLevel">2</ac:parameter>
+  <ac:parameter ac:name="maxLevel">2</ac:parameter>
+</ac:structured-macro>
+```
+````
+
+This is a block-level escape hatch — the whole block is raw storage XML. Confluence validates it at publish time.
 
 ## License
 

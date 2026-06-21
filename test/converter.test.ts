@@ -74,6 +74,41 @@ describe('Code blocks', () => {
   })
 })
 
+describe('Confluence passthrough', () => {
+  it('emits a confluence fence verbatim and unescaped', () => {
+    const result = md2confluence('```confluence\n<ac:structured-macro ac:name="toc"/>\n```')
+    expect(result).toContain('<ac:structured-macro ac:name="toc"/>')
+    expect(result).not.toContain('&lt;')
+    expect(result).not.toContain('ac:name="code"')
+  })
+
+  it('preserves special characters and nested macros byte-for-byte', () => {
+    const body =
+      '<ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">public</ac:parameter></ac:structured-macro>'
+    const result = md2confluence(`\`\`\`confluence\n<p>a & b "c" ${body}</p>\n\`\`\``)
+    expect(result).toContain(`<p>a & b "c" ${body}</p>`)
+    expect(result).not.toContain('&amp;')
+    expect(result).not.toContain('&quot;')
+  })
+
+  it('preserves newlines in a multi-line fence body', () => {
+    const result = md2confluence('```confluence\n<table>\n  <tr><td>x</td></tr>\n</table>\n```')
+    expect(result).toBe('<table>\n  <tr><td>x</td></tr>\n</table>')
+  })
+
+  it('does not affect real language code blocks', () => {
+    const result = md2confluence('```js\nconst x = 1\n```')
+    expect(result).toContain('<ac:structured-macro ac:name="code">')
+    expect(result).toContain('<ac:parameter ac:name="language">javascript</ac:parameter>')
+  })
+
+  it('matches the language exactly — uppercase falls through to a code block', () => {
+    const result = md2confluence('```Confluence\n<ac:structured-macro ac:name="toc"/>\n```')
+    expect(result).toContain('<ac:structured-macro ac:name="code">')
+    expect(result).toContain('<![CDATA[<ac:structured-macro ac:name="toc"/>]]>')
+  })
+})
+
 describe('Lists', () => {
   it('converts unordered lists', () => {
     const result = md2confluence('- Item 1\n- Item 2')

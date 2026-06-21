@@ -32,6 +32,12 @@ registerConverter<Code>('code', (node, context) => {
     return `<ac:image ac:align="center" ac:layout="center" ac:width="800" ac:thumbnail="true"><ri:attachment ri:filename="${filename}"/></ac:image>`
   }
 
+  // Raw Confluence storage-format passthrough. Emitted verbatim — no escaping, no code
+  // macro — as an escape hatch for macros with no markdown form (toc, details, status, …).
+  if (lang === 'confluence') {
+    return code
+  }
+
   const params: Record<string, string> = {}
   if (lang) {
     params.language = mapLanguage(lang)
