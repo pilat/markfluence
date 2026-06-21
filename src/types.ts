@@ -30,6 +30,7 @@ export interface ConversionContext {
   config: Config
   frontmatter: Frontmatter
   attachments: Map<string, AttachmentInfo>
+  localImages: Map<string, string>
   pageId?: string
 }
 
