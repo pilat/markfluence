@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { convert } from '../src/converter.js'
 import { getMermaidFilename } from '../src/mermaid/render.js'
 import { parse } from '../src/parser.js'
@@ -15,6 +15,7 @@ function createContext(): ConversionContext {
     },
     frontmatter: {},
     attachments: new Map(),
+    localImages: new Map(),
   }
 }
 
@@ -123,6 +124,49 @@ describe('Images', () => {
   it('converts local images as attachments', () => {
     const result = md2confluence('![alt](./image.png)')
     expect(result).toContain('<ri:attachment ri:filename="image.png"/>')
+  })
+
+  it('parses Obsidian-style width on remote images', () => {
+    const result = md2confluence('![a|300](https://x/p.png)')
+    expect(result).toContain('ac:width="300"')
+    expect(result).toContain('<ri:url ri:value="https://x/p.png"/>')
+    expect(result).toContain('ac:alt="a"')
+    expect(result).not.toContain('ac:height')
+  })
+
+  it('parses Obsidian-style width and height', () => {
+    const result = md2confluence('![a|300x200](https://x/p.png)')
+    expect(result).toContain('ac:width="300"')
+    expect(result).toContain('ac:height="200"')
+  })
+
+  it('leaves non-numeric pipe segments in alt text', () => {
+    const result = md2confluence('![a|b](https://x/p.png)')
+    expect(result).not.toContain('ac:width')
+    expect(result).toContain('ac:alt="a|b"')
+  })
+
+  it('omits empty alt when only a width is given', () => {
+    const result = md2confluence('![|300](https://x/p.png)')
+    expect(result).toContain('ac:width="300"')
+    expect(result).not.toContain('ac:alt')
+  })
+
+  it('applies width to local images via the basename fallback', () => {
+    const result = md2confluence('![a|300](./pic.png)')
+    expect(result).toContain('ac:width="300"')
+    expect(result).toContain('<ri:attachment ri:filename="pic.png"/>')
+  })
+
+  it('drops data: URI images instead of emitting a bogus attachment', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const result = md2confluence('![x](data:image/png;base64,iVBORw0KGgo=)')
+      expect(result).toBe('<p></p>')
+      expect(result).not.toContain('ri:attachment')
+    } finally {
+      warn.mockRestore()
+    }
   })
 })
 

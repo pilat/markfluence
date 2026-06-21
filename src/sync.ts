@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { extname, resolve } from 'node:path'
+import { dirname, extname, resolve } from 'node:path'
 import { ConfluenceApiError, ConfluenceClient } from './confluence/client.js'
 import type { Page } from './confluence/types.js'
 import { convert } from './converter.js'
+import { preprocessImages } from './images/preprocess.js'
 import { closeBrowser, preprocessMermaid } from './mermaid/index.js'
 import { parse } from './parser.js'
 import type { AttachmentInfo, Config, ConversionContext } from './types.js'
@@ -54,11 +55,15 @@ async function syncFile(file: string, config: Config, client: ConfluenceClient):
     config,
     frontmatter,
     attachments: new Map(),
+    localImages: new Map(),
     pageId: frontmatter['confluence-page-id'],
   }
 
   // Pre-render mermaid diagrams (populates context.attachments)
   await preprocessMermaid(ast, context)
+
+  // Upload local image files referenced by the markdown (populates context.attachments + localImages)
+  await preprocessImages(ast, context, dirname(absolutePath))
 
   const content = convert(ast, context)
   const contentHash = createHash('md5').update(content).digest('hex')

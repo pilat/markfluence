@@ -153,6 +153,7 @@ describe('syncFiles', () => {
         config: mockConfig,
         frontmatter: {},
         attachments: new Map(),
+        localImages: new Map(),
       }
       const expectedContent = convert(ast, context)
 
