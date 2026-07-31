@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-07-31
+
+### Changed
+
+- TypeScript updated to v7 (dev dependency)
+- GitHub Actions `setup-node` updated to v7
+
+### Fixed
+
+- README now correctly requires Node.js 22+ instead of the EOL Node 20
+- Mermaid ELK rendering test timeout increased to 15s to prevent false failures on slower machines
+
 ## [0.4.0] - 2026-06-21
 
 ### Added
