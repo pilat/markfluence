@@ -37,7 +37,7 @@ npx markfluence docs/
 npx markfluence --dry-run docs/
 ```
 
-Requires Node.js 20+.
+Requires Node.js 22+.
 
 ## Environment Variables
 

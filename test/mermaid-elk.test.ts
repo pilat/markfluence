@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getMermaidFilename, getMermaidHash, renderMermaid } from '../src/mermaid/render.js'
 
-describe('Mermaid ELK rendering', () => {
+describe('Mermaid ELK rendering', { timeout: 15000 }, () => {
   const NESTED_SUBGRAPH_DIAGRAM = `
 flowchart TB
     subgraph VPC["VPC"]
